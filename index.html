@@ -1,0 +1,2279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Taste of Home | Homemade Food</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --tg-theme-bg: #FDFCF8;
+            --primary-red: #D42F2F;
+            --accent-gold: #C5A059;
+            --dark-graphite: #1A1A1A;
+            --soft-beige: #F5F5F0;
+            --white: #FFFFFF;
+            --shadow: 0 10px 30px rgba(0,0,0,0.06);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --khokhloma-pattern: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 10q15 0 15 15t-15 15t-15-15t15-15M50 50q20-10 20 10t-20 10t-20-10t20-10' fill='%23C5A059' fill-opacity='0.05'/%3E%3C/svg%3E");
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: var(--tg-theme-bg);
+            color: var(--dark-graphite);
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image: var(--khokhloma-pattern);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .app-container {
+            padding-bottom: 90px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.35s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero {
+            position: relative;
+            min-height: 420px;
+            overflow: hidden;
+            border-radius: 0 0 28px 28px;
+            background: #222;
+        }
+
+        .hero-slide {
+            position: absolute;
+            inset: 0;
+            padding: 30px 20px;
+            display: flex;
+            align-items: flex-end;
+            color: var(--white);
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.45s ease, visibility 0.45s ease;
+        }
+
+        .hero-slide.active {
+            opacity: 1;
+            visibility: visible;
+            z-index: 1;
+        }
+
+        .hero-pagination {
+            position: absolute;
+            left: 50%;
+            bottom: 18px;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 3;
+        }
+
+        .hero-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.45);
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .hero-dot.active {
+            background: var(--white);
+            transform: scale(1.2);
+        }
+
+        .hero-decor {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            opacity: 0.6;
+            border: 2px solid var(--accent-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            text-align: center;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            padding-bottom: 18px;
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 38px;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .hero-subtitle {
+            font-weight: 300;
+            opacity: 0.9;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+            margin-bottom: 25px;
+        }
+
+        .search-box {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .search-box input {
+            background: none;
+            border: none;
+            color: white;
+            width: 100%;
+            margin-left: 10px;
+            outline: none;
+            font-size: 15px;
+        }
+
+        .search-box input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .menu-toolbar {
+            padding: 20px 20px 0;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .language-flags {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--white);
+            padding: 6px;
+            border-radius: 999px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .lang-flag-btn {
+            border: none;
+            background: transparent;
+            border-radius: 999px;
+            padding: 7px 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: #777;
+            transition: var(--transition);
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .lang-flag-btn.active {
+            background: var(--primary-red);
+            color: var(--white);
+            box-shadow: 0 8px 18px rgba(212, 47, 47, 0.25);
+        }
+
+        .flag-icon {
+            width: 28px;
+            height: 18px;
+            border-radius: 3px;
+            display: inline-block;
+            overflow: hidden;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.08);
+            flex: 0 0 auto;
+        }
+
+        .flag-ru {
+            background: linear-gradient(
+                to bottom,
+                #ffffff 0%,
+                #ffffff 33.33%,
+                #1c57a5 33.33%,
+                #1c57a5 66.66%,
+                #d52b1e 66.66%,
+                #d52b1e 100%
+            );
+        }
+
+        .flag-gb {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 36'%3E%3CclipPath id='a'%3E%3Cpath d='M0 0h60v36H0z'/%3E%3C/clipPath%3E%3Cg clip-path='url(%23a)'%3E%3Cpath fill='%23012169' d='M0 0h60v36H0z'/%3E%3Cpath stroke='%23fff' stroke-width='8' d='M0 0l60 36M60 0L0 36'/%3E%3Cpath stroke='%23C8102E' stroke-width='4.8' d='M0 0l60 36M60 0L0 36'/%3E%3Cpath stroke='%23fff' stroke-width='12' d='M30 0v36M0 18h60'/%3E%3Cpath stroke='%23C8102E' stroke-width='7.2' d='M30 0v36M0 18h60'/%3E%3C/g%3E%3C/svg%3E");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .categories {
+            display: flex;
+            overflow-x: auto;
+            padding: 25px 20px;
+            gap: 12px;
+            scrollbar-width: none;
+        }
+
+        .categories::-webkit-scrollbar,
+        .popular-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .cat-chip {
+            padding: 10px 18px;
+            background: var(--white);
+            border-radius: 50px;
+            white-space: nowrap;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .cat-chip.active {
+            background: var(--primary-red);
+            color: white;
+        }
+
+        .section-title {
+            padding: 0 20px 15px;
+            font-size: 22px;
+            font-weight: 800;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title span {
+            font-size: 14px;
+            color: var(--primary-red);
+            font-weight: 600;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 0 20px;
+        }
+
+        .product-card {
+            background: var(--white);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            border: 1px solid rgba(0,0,0,0.03);
+            cursor: pointer;
+        }
+
+        .product-card:active {
+            transform: scale(0.98);
+        }
+
+        .product-img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            display: block;
+            background: #f3f3f3;
+        }
+
+        .product-info {
+            padding: 15px;
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--accent-gold);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            z-index: 2;
+        }
+
+        .product-badge.disabled {
+            background: #777;
+        }
+
+        .product-name {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 42px;
+        }
+
+        .product-price {
+            font-weight: 800;
+            color: var(--primary-red);
+            font-size: 16px;
+        }
+
+        .product-weight {
+            font-size: 12px;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        .add-btn {
+            width: 36px;
+            height: 36px;
+            background: var(--dark-graphite);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .add-btn:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        .popular-scroll {
+            display: flex;
+            overflow-x: auto;
+            padding: 0 20px 25px;
+            gap: 15px;
+            scrollbar-width: none;
+        }
+
+        .popular-card {
+            min-width: 260px;
+            height: 120px;
+            background: var(--white);
+            border-radius: 20px;
+            display: flex;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .popular-card img {
+            width: 100px;
+            height: 120px;
+            object-fit: cover;
+            background: #f3f3f3;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 600px;
+            background: rgba(255,255,255,0.94);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 10px 25px;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #999;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 600;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-item.active {
+            color: var(--primary-red);
+        }
+
+        .nav-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+            position: relative;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            background: var(--primary-red);
+            color: white;
+            font-size: 9px;
+            min-width: 16px;
+            height: 16px;
+            padding: 0 4px;
+            border-radius: 20px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .cart-item {
+            background: white;
+            margin: 15px 20px;
+            padding: 15px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: var(--shadow);
+            gap: 15px;
+        }
+
+        .cart-item img {
+            width: 70px;
+            height: 70px;
+            border-radius: 15px;
+            object-fit: cover;
+            background: #f3f3f3;
+        }
+
+        .cart-qty {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+        }
+
+        .qty-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .order-form {
+            padding: 20px;
+            background: white;
+            border-radius: 30px 30px 0 0;
+            margin-top: 20px;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.05);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #777;
+            text-transform: uppercase;
+        }
+
+        .input-group input,
+        .input-group textarea,
+        .input-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 12px;
+            border: 1px solid #EEE;
+            background: var(--soft-beige);
+            font-family: inherit;
+            outline: none;
+        }
+
+        .checkout-btn,
+        .secondary-btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 18px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .checkout-btn {
+            background: var(--primary-red);
+            color: white;
+            margin-top: 20px;
+            box-shadow: 0 10px 20px rgba(212, 47, 47, 0.3);
+        }
+
+        .checkout-btn:disabled {
+            background: #999;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .secondary-btn {
+            background: var(--dark-graphite);
+            color: white;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: none;
+            align-items: flex-end;
+        }
+
+        .modal-sheet {
+            background: white;
+            width: 100%;
+            border-radius: 30px 30px 0 0;
+            padding: 30px 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.35s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-overlay.active .modal-sheet {
+            transform: translateY(0);
+        }
+
+        .profile-header {
+            background: linear-gradient(45deg, var(--dark-graphite), #333);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 0 0 40px 40px;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid var(--accent-gold);
+            margin: 0 auto 15px;
+            background: #555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            overflow: hidden;
+        }
+
+        .divider-khokhloma {
+            height: 15px;
+            background-image: var(--khokhloma-pattern);
+            background-size: 40px;
+            margin: 20px 0;
+            opacity: 0.3;
+        }
+
+        .empty-cart,
+        .empty-state {
+            text-align: center;
+            padding: 100px 20px;
+            color: #999;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .history-item {
+            padding: 12px 0;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .summary-line {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        .summary-line.total {
+            font-weight: 800;
+            font-size: 18px;
+            margin-top: 12px;
+        }
+
+        .delivery-note {
+            margin-top: 8px;
+            font-size: 13px;
+            color: #777;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        @media (max-width: 420px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-title {
+                font-size: 32px;
+            }
+
+            .menu-toolbar {
+                justify-content: center;
+            }
+
+            .lang-flag-btn {
+                padding: 8px 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <div id="menu-tab" class="tab-content active">
+            <section class="hero" id="hero-slider">
+                <div class="hero-slide active" data-slide-index="0" style="background-image: linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.78) 100%), url('hero.jpg');">
+                    <div class="hero-content">
+                        <div class="hero-decor">Taste<br>of<br>Home</div>
+                        <h1 class="hero-title">Taste of Home</h1>
+                        <p class="hero-subtitle">Homemade food with warmth</p>
+                        <div class="search-box">
+                            <span>🔍</span>
+                            <input type="text" id="search-input" data-i18n-placeholder="searchPlaceholder" placeholder="Search your favorite dishes...">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-slide" data-slide-index="1" style="background-image: linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.78) 100%), url('hero_2.jpg');">
+                    <div class="hero-content">
+                        <div class="hero-decor">Fresh<br>home<br>food</div>
+                        <h1 class="hero-title">A taste like home</h1>
+                        <p class="hero-subtitle">Hot lunches, soups and pastries every day</p>
+                        <div class="search-box">
+                            <span>🔍</span>
+                            <input type="text" class="search-input-mirror" data-i18n-placeholder="searchPlaceholder" placeholder="Search your favorite dishes...">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-slide" data-slide-index="2" style="background-image: linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.78) 100%), url('hero_3.jpg');">
+                    <div class="hero-content">
+                        <div class="hero-decor">Daily<br>menu</div>
+                        <h1 class="hero-title">A taste you want to come back to</h1>
+                        <p class="hero-subtitle">Simple, cozy and comforting food</p>
+                        <div class="search-box">
+                            <span>🔍</span>
+                            <input type="text" class="search-input-mirror" data-i18n-placeholder="searchPlaceholder" placeholder="Search your favorite dishes...">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-pagination" id="hero-pagination"></div>
+            </section>
+
+            <div class="menu-toolbar">
+                <div class="language-flags" id="language-flags" aria-label="Language selector">
+                    <button type="button" class="lang-flag-btn active" data-language="en" aria-label="English">
+                        <i class="flag-icon flag-gb"></i>
+                        <span>EN</span>
+                    </button>
+
+                    <button type="button" class="lang-flag-btn" data-language="ru" aria-label="Русский">
+                        <i class="flag-icon flag-ru"></i>
+                        <span>RU</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="categories" id="categories"></div>
+
+            <div class="section-title">
+                <span data-i18n="todayMenu">Today on the menu</span>
+                <span id="menu-count">All (0)</span>
+            </div>
+
+            <div class="popular-scroll" id="popular-list"></div>
+
+            <div class="section-title" data-i18n="mainMenu">Main menu</div>
+
+            <div id="loading-state" class="loading-state">
+                Loading menu...
+            </div>
+
+            <div class="products-grid" id="main-menu"></div>
+
+            <div id="menu-empty" class="empty-state hidden">
+                <div style="font-size: 54px; margin-bottom: 16px;">🍽️</div>
+                <h3 data-i18n="nothingFound">Nothing found</h3>
+                <p data-i18n="tryAnother">Try another query or category.</p>
+            </div>
+
+            <div class="divider-khokhloma"></div>
+
+            <div style="padding: 20px; text-align: center;">
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 24px;" data-i18n="withLove">Cooked with love</h3>
+                <p style="font-size: 14px; opacity: 0.6; margin-top: 10px;" data-i18n="withLoveDesc">Natural ingredients and traditional recipes in every dish.</p>
+            </div>
+        </div>
+
+        <div id="cart-tab" class="tab-content">
+            <div style="padding: 30px 20px 10px;">
+                <h2 style="font-size: 28px; font-weight: 800;" data-i18n="cart">Cart</h2>
+            </div>
+
+            <div id="cart-items-list"></div>
+
+            <div id="cart-empty-state" class="empty-cart hidden">
+                <div style="font-size: 60px; margin-bottom: 20px;">🍲</div>
+                <h3 data-i18n="cartEmpty">Your cart is empty</h3>
+                <p data-i18n="cartEmptyDesc">Time to add something delicious!</p>
+            </div>
+
+            <div id="cart-footer" class="order-form hidden">
+                <div class="summary-line">
+                    <span data-i18n="subtotal">Food subtotal</span>
+                    <span id="subtotal-amount">0 ₫</span>
+                </div>
+
+                <div class="summary-line">
+                    <span data-i18n="deliveryFee">Delivery</span>
+                    <span id="delivery-amount">0 ₫</span>
+                </div>
+
+                <div id="delivery-note" class="delivery-note"></div>
+
+                <div class="summary-line total">
+                    <span data-i18n="totalToPay">Total to pay</span>
+                    <span id="total-amount" style="color: var(--primary-red);">0 ₫</span>
+                </div>
+
+                <div class="input-group">
+                    <label data-i18n="yourName">Your name</label>
+                    <input type="text" id="order-name" data-i18n-placeholder="yourNamePlaceholder" placeholder="What is your name?">
+                </div>
+
+                <div class="input-group">
+                    <label data-i18n="phone">Phone</label>
+                    <input type="tel" id="order-phone" data-i18n-placeholder="phonePlaceholder" placeholder="+1...">
+                </div>
+
+                <div class="input-group">
+                    <label data-i18n="whenReceive">How many hours from now would you like to receive the order</label>
+                    <select id="order-time">
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label data-i18n="orderType">Receiving method</label>
+                    <select id="order-type">
+                        <option value="delivery" data-i18n="delivery">Delivery</option>
+                        <option value="pickup" data-i18n="pickup">Pickup</option>
+                    </select>
+                </div>
+
+                <div class="input-group" id="district-group">
+                    <label data-i18n="district">Delivery area</label>
+                    <select id="order-district"></select>
+                </div>
+
+                <div class="input-group" id="address-group">
+                    <label data-i18n="address">Address</label>
+                    <input type="text" id="order-address" data-i18n-placeholder="addressPlaceholder" placeholder="Where should we deliver?">
+                </div>
+
+                <div class="input-group">
+                    <label data-i18n="comment">Order comment</label>
+                    <textarea id="order-comment" rows="2" data-i18n-placeholder="commentPlaceholder" placeholder="Your notes..."></textarea>
+                </div>
+
+                <button class="checkout-btn" id="checkout-btn" data-i18n="checkout">Place order</button>
+            </div>
+        </div>
+
+        <div id="profile-tab" class="tab-content">
+            <div class="profile-header">
+                <div id="user-photo" class="user-avatar">👤</div>
+                <h2 id="user-name">User</h2>
+                <p id="user-handle" style="opacity: 0.6; font-size: 14px;">@username</p>
+            </div>
+
+            <div style="padding: 20px; display: grid; gap: 16px;">
+                <div class="profile-card">
+                    <div style="margin-bottom: 20px;">
+                        <span style="display: block; font-size: 12px; color: #999; text-transform: uppercase;" data-i18n="myData">My details</span>
+                        <div id="profile-details" style="margin-top: 10px; font-weight: 600;"></div>
+                    </div>
+                </div>
+
+                <div class="profile-card">
+                    <span style="display: block; font-size: 12px; color: #999; text-transform: uppercase;" data-i18n="orderHistory">Order history</span>
+                    <div id="order-history" style="margin-top: 10px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active" data-tab="menu">
+            <span class="nav-icon">🍽️</span>
+            <span data-i18n="menu">Menu</span>
+        </a>
+
+        <a href="#" class="nav-item" data-tab="cart">
+            <span class="nav-icon">🛒 <span id="cart-badge" class="cart-badge">0</span></span>
+            <span data-i18n="cart">Cart</span>
+        </a>
+
+        <a href="#" class="nav-item" data-tab="profile">
+            <span class="nav-icon">👤</span>
+            <span data-i18n="profile">Profile</span>
+        </a>
+    </nav>
+
+    <div class="modal-overlay" id="product-modal">
+        <div class="modal-sheet" onclick="event.stopPropagation()">
+            <div style="text-align: right;">
+                <button type="button" id="modal-close-btn" style="background: none; border: none; font-size: 24px; cursor: pointer;">✕</button>
+            </div>
+
+            <img id="modal-img" src="" alt="" style="width: 100%; height: 250px; object-fit: cover; border-radius: 20px; margin-bottom: 20px; background:#f3f3f3;">
+
+            <h2 id="modal-name" style="font-size: 24px; margin-bottom: 10px;"></h2>
+
+            <div id="modal-price" style="font-size: 20px; color: var(--primary-red); font-weight: 800; margin-bottom: 15px;"></div>
+
+            <p id="modal-desc" style="color: #666; margin-bottom: 25px; line-height: 1.6;"></p>
+
+            <button class="checkout-btn" id="modal-add-btn" data-i18n="addToCart">Add to cart</button>
+        </div>
+    </div>
+
+    <script>
+        const APP_CONFIG = {
+            API_BASE_URL: 'https://linoleum-rope-commerce.ngrok-free.dev',
+            GROUP_URL: 'https://t.me/homemade_global_cuisine'
+        };
+
+        const translations = {
+            ru: {
+                appTitle: 'Taste of Home | Домашняя еда',
+                loadingMenu: 'Загружаем меню...',
+                searchPlaceholder: 'Поиск любимых блюд...',
+                todayMenu: 'Сегодня в меню',
+                mainMenu: 'Основное меню',
+                nothingFound: 'Ничего не найдено',
+                tryAnother: 'Попробуйте другой запрос или категорию.',
+                withLove: 'Готовим с любовью',
+                withLoveDesc: 'Натуральные ингредиенты и традиционные рецепты в каждом блюде.',
+                menu: 'Меню',
+                cart: 'Корзина',
+                profile: 'Профиль',
+                cartEmpty: 'Корзина пуста',
+                cartEmptyDesc: 'Самое время добавить что-нибудь вкусное!',
+                subtotal: 'Сумма блюд',
+                deliveryFee: 'Доставка',
+                totalToPay: 'Итого к оплате',
+                yourName: 'Ваше имя',
+                yourNamePlaceholder: 'Как вас зовут?',
+                phone: 'Телефон',
+                phonePlaceholder: '+7...',
+                whenReceive: 'Через сколько хотите получить заказ',
+                orderType: 'Способ получения',
+                delivery: 'Доставка',
+                pickup: 'Самовывоз',
+                district: 'Район доставки',
+                address: 'Адрес',
+                addressPlaceholder: 'Куда доставить?',
+                comment: 'Комментарий к заказу',
+                commentPlaceholder: 'Ваши пожелания...',
+                checkout: 'Оформить заказ',
+                sendingOrder: 'Отправляем заказ...',
+                myData: 'Мои данные',
+                orderHistory: 'История заказов',
+                addToCart: 'Добавить в корзину',
+                unavailable: 'Временно недоступно',
+                outOfStock: 'Нет в наличии',
+                all: 'Все',
+                hit: 'Хит',
+                popular: 'Популярно',
+                today: 'Сегодня',
+                homemade: 'Домашнее',
+                fresh: 'Свежее',
+                sale: 'Скидка',
+                new: 'Новинка',
+                guest: 'Гость',
+                outsideTelegram: 'Открыто вне Telegram',
+                openInTelegram: 'Для автозаполнения профиля откройте миниприложение внутри Telegram.',
+                tgId: 'Telegram ID',
+                langField: 'Язык',
+                usernameField: 'Username',
+                userTelegram: 'Пользователь Telegram',
+                noOrders: 'У вас пока нет заказов',
+                orderFor: 'Заказ',
+                hours: 'ч.',
+                requiredFields: 'Заполните имя, телефон и адрес доставки.',
+                emptyCartAlert: 'Корзина пуста. Добавьте хотя бы одно блюдо.',
+                confirmOrder: 'Подтвердить оформление заказа?',
+                orderPlaced: 'Заказ успешно оформлен. Мы свяжемся с вами в ближайшее время.',
+                orderNumber: 'Номер заказа',
+                loadError: 'Не удалось загрузить меню. Проверь backend и ngrok ссылку.',
+                free: 'Бесплатно',
+                grabTariff: 'По тарифу Grab',
+                pickupLabel: 'Самовывоз',
+                deliveryFreeNote: 'Доставка бесплатна для выбранного района.',
+                deliveryOceanPark2Note: 'Для Ocean Park 2 и Eco Park доставка бесплатна от 200 000 ₫, иначе 50 000 ₫.',
+                deliveryHanoiMidNote: 'Для Hanoi доставка бесплатна от 500 000 ₫, от 200 000 ₫ до 500 000 ₫ — 80 000 ₫, ниже — Grab.',
+                deliveryGrabNote: 'Для этого заказа доставка рассчитывается по тарифу Grab.',
+                districtOceanPark1: 'Ocean Park 1',
+                districtOceanPark2: 'Ocean Park 2',
+                districtEcoPark: 'Eco Park',
+                districtHanoi: 'Hanoi'
+            },
+            en: {
+                appTitle: 'Taste of Home | Homemade Food',
+                loadingMenu: 'Loading menu...',
+                searchPlaceholder: 'Search your favorite dishes...',
+                todayMenu: 'Today on the menu',
+                mainMenu: 'Main menu',
+                nothingFound: 'Nothing found',
+                tryAnother: 'Try another query or category.',
+                withLove: 'Cooked with love',
+                withLoveDesc: 'Natural ingredients and traditional recipes in every dish.',
+                menu: 'Menu',
+                cart: 'Cart',
+                profile: 'Profile',
+                cartEmpty: 'Your cart is empty',
+                cartEmptyDesc: 'Time to add something delicious!',
+                subtotal: 'Food subtotal',
+                deliveryFee: 'Delivery',
+                totalToPay: 'Total to pay',
+                yourName: 'Your name',
+                yourNamePlaceholder: 'What is your name?',
+                phone: 'Phone',
+                phonePlaceholder: '+1...',
+                whenReceive: 'How many hours from now would you like to receive the order',
+                orderType: 'Receiving method',
+                delivery: 'Delivery',
+                pickup: 'Pickup',
+                district: 'Delivery area',
+                address: 'Address',
+                addressPlaceholder: 'Where should we deliver?',
+                comment: 'Order comment',
+                commentPlaceholder: 'Your notes...',
+                checkout: 'Place order',
+                sendingOrder: 'Sending order...',
+                myData: 'My details',
+                orderHistory: 'Order history',
+                addToCart: 'Add to cart',
+                unavailable: 'Temporarily unavailable',
+                outOfStock: 'Out of stock',
+                all: 'All',
+                hit: 'Hit',
+                popular: 'Popular',
+                today: 'Today',
+                homemade: 'Homemade',
+                fresh: 'Fresh',
+                sale: 'Sale',
+                new: 'New',
+                guest: 'Guest',
+                outsideTelegram: 'Opened outside Telegram',
+                openInTelegram: 'Open the mini app inside Telegram to auto-fill your profile.',
+                tgId: 'Telegram ID',
+                langField: 'Language',
+                usernameField: 'Username',
+                userTelegram: 'Telegram user',
+                noOrders: 'You have no orders yet',
+                orderFor: 'Order',
+                hours: 'h',
+                requiredFields: 'Please fill in name, phone and delivery address.',
+                emptyCartAlert: 'Your cart is empty. Add at least one dish.',
+                confirmOrder: 'Confirm your order?',
+                orderPlaced: 'Your order has been placed successfully. We will contact you soon.',
+                orderNumber: 'Order number',
+                loadError: 'Failed to load menu. Check backend and ngrok URL.',
+                free: 'Free',
+                grabTariff: 'Grab tariff',
+                pickupLabel: 'Pickup',
+                deliveryFreeNote: 'Delivery is free for the selected area.',
+                deliveryOceanPark2Note: 'For Ocean Park 2 and Eco Park, delivery is free from 200,000 ₫, otherwise 50,000 ₫.',
+                deliveryHanoiMidNote: 'For Hanoi, delivery is free from 500,000 ₫, from 200,000 ₫ to 500,000 ₫ it is 80,000 ₫, below that it is Grab.',
+                deliveryGrabNote: 'Delivery for this order is calculated by the Grab service tariff.',
+                districtOceanPark1: 'Ocean Park 1',
+                districtOceanPark2: 'Ocean Park 2',
+                districtEcoPark: 'Eco Park',
+                districtHanoi: 'Hanoi'
+            }
+        };
+
+        const safeTelegram = (() => {
+            const fallback = {
+                initDataUnsafe: {},
+                expand() {},
+                ready() {},
+                showAlert(message, callback) {
+                    alert(message);
+                    if (typeof callback === 'function') callback();
+                },
+                showConfirm(message, callback) {
+                    const result = confirm(message);
+                    if (typeof callback === 'function') callback(result);
+                },
+                HapticFeedback: {
+                    impactOccurred() {}
+                }
+            };
+
+            return window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : fallback;
+        })();
+
+        const tg = safeTelegram;
+        tg.expand();
+        tg.ready();
+
+        const PLACEHOLDER_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400' viewBox='0 0 600 400'%3E%3Crect width='600' height='400' fill='%23f5f5f0'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23999' font-family='Arial' font-size='32'%3ETaste of Home%3C/text%3E%3C/svg%3E";
+        const CART_STORAGE_KEY = 'taste_of_home_cart';
+        const HISTORY_STORAGE_KEY = 'taste_of_home_orders';
+        const FORM_STORAGE_KEY = 'taste_of_home_form';
+        const LANG_STORAGE_KEY = 'taste_of_home_lang';
+
+        let products = [];
+        let categoriesFromBackend = [];
+        let bannersFromBackend = [];
+
+        const districtOptions = [
+            { key: 'districtOceanPark1', apiValue: 'Ocean Park 1' },
+            { key: 'districtOceanPark2', apiValue: 'Ocean Park 2' },
+            { key: 'districtEcoPark', apiValue: 'Eco Park' },
+            { key: 'districtHanoi', apiValue: 'Hanoi' }
+        ];
+
+        const state = {
+            activeTab: 'menu',
+            activeCategory: 'all',
+            search: '',
+            cart: loadJSON(CART_STORAGE_KEY, []),
+            orderHistory: loadJSON(HISTORY_STORAGE_KEY, []),
+            currentHeroSlide: 0,
+            heroAutoplay: null,
+            heroTouchStartX: 0,
+            heroTouchEndX: 0,
+            language: loadLanguage()
+        };
+
+        function apiBase() {
+            return APP_CONFIG.API_BASE_URL.replace(/\/$/, '');
+        }
+
+        function apiUrl(path) {
+            return `${apiBase()}${path}`;
+        }
+
+        function fullImageUrl(path) {
+            if (!path) return PLACEHOLDER_IMG;
+
+            if (path.startsWith('http://') || path.startsWith('https://')) {
+                return path;
+            }
+
+            if (!path.startsWith('/')) {
+                path = '/' + path;
+            }
+
+            return `${apiBase()}${path}`;
+        }
+
+        async function apiGet(path) {
+            const response = await fetch(apiUrl(path), {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`GET ${path}: ${response.status}`);
+            }
+
+            return response.json();
+        }
+
+        async function apiPost(path, payload) {
+            const response = await fetch(apiUrl(path), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                throw new Error(data.detail || `POST ${path}: ${response.status}`);
+            }
+
+            return data;
+        }
+
+        function loadJSON(key, fallback) {
+            try {
+                const value = localStorage.getItem(key);
+                return value ? JSON.parse(value) : fallback;
+            } catch (error) {
+                console.error('Storage read error:', error);
+                return fallback;
+            }
+        }
+
+        function saveJSON(key, value) {
+            try {
+                localStorage.setItem(key, JSON.stringify(value));
+            } catch (error) {
+                console.error('Storage write error:', error);
+            }
+        }
+
+        function loadLanguage() {
+            const saved = localStorage.getItem(LANG_STORAGE_KEY);
+
+            if (saved === 'ru' || saved === 'en') {
+                return saved;
+            }
+
+            return 'en';
+        }
+
+        function saveLanguage() {
+            localStorage.setItem(LANG_STORAGE_KEY, state.language);
+        }
+
+        function t(key) {
+            return translations[state.language][key] || translations.en[key] || translations.ru[key] || key;
+        }
+
+        function formatPrice(value) {
+            return Number(value || 0).toLocaleString(state.language === 'ru' ? 'ru-RU' : 'en-US') + ' ₫';
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function getProductName(product) {
+            return product.name?.[state.language] || product.name?.en || product.name?.ru || product.name_ru || 'No name';
+        }
+
+        function getProductDesc(product) {
+            return product.desc?.[state.language] || product.desc?.en || product.desc?.ru || product.description_ru || '';
+        }
+
+        function getCategoryLabel(categoryKey) {
+            if (categoryKey === 'all') return t('all');
+
+            const category = categoriesFromBackend.find(item => item.id === categoryKey || item.key === categoryKey);
+
+            if (category) {
+                return state.language === 'ru'
+                    ? category.title_ru || category.name?.ru || category.title_en || categoryKey
+                    : category.title_en || category.name?.en || category.title_ru || categoryKey;
+            }
+
+            return categoryKey;
+        }
+
+        function getBadgeLabel(badgeKey) {
+            return badgeKey ? t(badgeKey) : '';
+        }
+
+        function normalizeText(value) {
+            return String(value || '').toLowerCase().replace(/ё/g, 'е').replace(/\s+/g, ' ').trim();
+        }
+
+        function getCategories() {
+            if (categoriesFromBackend.length) {
+                return ['all', ...categoriesFromBackend.map(item => item.id || item.key)];
+            }
+
+            return ['all', ...new Set(products.map(item => item.category))];
+        }
+
+        function getFilteredProducts() {
+            return products.filter(item => {
+                if (item.is_active === false) return false;
+
+                const byCategory = state.activeCategory === 'all' || item.category === state.activeCategory;
+                const term = normalizeText(state.search);
+
+                const haystack = normalizeText([
+                    getProductName(item),
+                    getProductDesc(item),
+                    getCategoryLabel(item.category),
+                    getBadgeLabel(item.badge || '')
+                ].join(' '));
+
+                const words = term ? term.split(' ').filter(Boolean) : [];
+                const bySearch = !words.length || words.every(word => haystack.includes(word));
+
+                return byCategory && bySearch;
+            });
+        }
+
+        function resolveImageSource(item) {
+            const source =
+                item?.image_data_url ||
+                item?.image_full_url ||
+                item?.image_url ||
+                item?.img ||
+                item?.image ||
+                '';
+
+            if (!source) {
+                return PLACEHOLDER_IMG;
+            }
+
+            if (String(source).startsWith('data:image')) {
+                return source;
+            }
+
+            return fullImageUrl(String(source));
+        }
+
+        function normalizeBackendProduct(item) {
+            return {
+                id: String(item.id),
+                category: item.category_id || item.category || '',
+                name: {
+                    ru: item.name_ru || item.name?.ru || '',
+                    en: item.name_en || item.name?.en || item.name_ru || ''
+                },
+                desc: {
+                    ru: item.description_ru || item.desc?.ru || '',
+                    en: item.description_en || item.desc?.en || item.description_ru || ''
+                },
+                price: Number(item.price || 0),
+                old_price: item.old_price || null,
+                img: resolveImageSource(item),
+                badge: item.badge || null,
+                weight: item.weight || '',
+                is_active: item.is_active !== 0 && item.is_active !== false,
+                is_available: item.is_available !== 0 && item.is_available !== false,
+                stock: typeof item.stock === 'number' ? item.stock : -1,
+                sort_order: Number(item.sort_order || item.sort || 100)
+            };
+        }
+
+        async function loadBackendData() {
+            const loadingState = document.getElementById('loading-state');
+
+            try {
+                if (loadingState) {
+                    loadingState.classList.remove('hidden');
+                    loadingState.textContent = t('loadingMenu');
+                }
+
+                const [categoriesData, bannersData, menuData] = await Promise.all([
+                    apiGet('/api/categories'),
+                    apiGet('/api/banners'),
+                    apiGet('/api/menu')
+                ]);
+
+                categoriesFromBackend = Array.isArray(categoriesData) ? categoriesData : [];
+                bannersFromBackend = Array.isArray(bannersData) ? bannersData : [];
+
+                products = Array.isArray(menuData)
+                    ? menuData.map(normalizeBackendProduct).sort((a, b) => a.sort_order - b.sort_order)
+                    : [];
+
+                syncCartWithBackend();
+                applyBackendBanners();
+
+                if (loadingState) {
+                    loadingState.classList.add('hidden');
+                }
+
+            } catch (error) {
+                console.error('Backend load error:', error);
+
+                products = [];
+                categoriesFromBackend = [];
+                bannersFromBackend = [];
+
+                if (loadingState) {
+                    loadingState.classList.remove('hidden');
+                    loadingState.textContent = t('loadError');
+                }
+
+                tg.showAlert(t('loadError'));
+            }
+        }
+
+        function applyBackendBanners() {
+            const slides = Array.from(document.querySelectorAll('.hero-slide'));
+
+            if (!slides.length || !bannersFromBackend.length) {
+                return;
+            }
+
+            bannersFromBackend.slice(0, slides.length).forEach((banner, index) => {
+                const slide = slides[index];
+                const img = resolveImageSource(banner);
+
+                slide.style.backgroundImage =
+                    `linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.78) 100%), url('${img}')`;
+
+                const title = slide.querySelector('.hero-title');
+                const subtitle = slide.querySelector('.hero-subtitle');
+
+                if (title) {
+                    title.textContent = state.language === 'ru'
+                        ? banner.title_ru || banner.title_en || 'Taste of Home'
+                        : banner.title_en || banner.title_ru || 'Taste of Home';
+                }
+
+                if (subtitle) {
+                    subtitle.textContent = state.language === 'ru'
+                        ? banner.subtitle_ru || banner.subtitle_en || ''
+                        : banner.subtitle_en || banner.subtitle_ru || '';
+                }
+            });
+        }
+
+        function renderLanguageFlags() {
+            document.querySelectorAll('[data-language]').forEach(button => {
+                button.classList.toggle('active', button.dataset.language === state.language);
+            });
+        }
+
+        function applyTranslations() {
+            document.documentElement.lang = state.language;
+            document.title = t('appTitle');
+
+            document.querySelectorAll('[data-i18n]').forEach(node => {
+                const key = node.getAttribute('data-i18n');
+                node.textContent = t(key);
+            });
+
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(node => {
+                const key = node.getAttribute('data-i18n-placeholder');
+                node.placeholder = t(key);
+            });
+
+            const orderType = document.getElementById('order-type');
+
+            if (orderType && orderType.options.length >= 2) {
+                orderType.options[0].textContent = t('delivery');
+                orderType.options[1].textContent = t('pickup');
+            }
+
+            const loadingState = document.getElementById('loading-state');
+            if (loadingState && !loadingState.classList.contains('hidden')) {
+                loadingState.textContent = t('loadingMenu');
+            }
+
+            applyBackendBanners();
+            renderLanguageFlags();
+        }
+
+        function renderDistrictOptions() {
+            const select = document.getElementById('order-district');
+            const currentValue = select.value;
+
+            select.innerHTML = districtOptions.map(item => `
+                <option value="${item.key}">${escapeHtml(t(item.key))}</option>
+            `).join('');
+
+            if (districtOptions.some(item => item.key === currentValue)) {
+                select.value = currentValue;
+            }
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categories');
+
+            container.innerHTML = getCategories().map(category => `
+                <button type="button" class="cat-chip ${category === state.activeCategory ? 'active' : ''}" data-category="${escapeHtml(category)}">
+                    ${escapeHtml(getCategoryLabel(category))}
+                </button>
+            `).join('');
+        }
+
+        function renderMenu() {
+            const menuGrid = document.getElementById('main-menu');
+            const popularScroll = document.getElementById('popular-list');
+            const counter = document.getElementById('menu-count');
+            const empty = document.getElementById('menu-empty');
+            const filtered = getFilteredProducts();
+
+            counter.textContent = `${t('all')} (${filtered.length})`;
+            empty.classList.toggle('hidden', filtered.length > 0);
+
+            menuGrid.innerHTML = filtered.map(item => `
+                <article class="product-card" data-open-product="${escapeHtml(item.id)}">
+                    ${item.badge ? `<div class="product-badge">${escapeHtml(getBadgeLabel(item.badge))}</div>` : ''}
+                    ${item.is_available ? '' : `<div class="product-badge disabled">${escapeHtml(t('outOfStock'))}</div>`}
+
+                    <img src="${escapeHtml(item.img)}" class="product-img" alt="${escapeHtml(getProductName(item))}" loading="lazy" onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'">
+
+                    <div class="product-info">
+                        <div class="product-name">${escapeHtml(getProductName(item))}</div>
+
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:5px;gap:10px;">
+                            <div>
+                                <div class="product-price">${formatPrice(item.price)}</div>
+                                ${item.weight ? `<div class="product-weight">${escapeHtml(item.weight)}</div>` : ''}
+                            </div>
+
+                            <button type="button" class="add-btn" data-add-product="${escapeHtml(item.id)}" ${item.is_available ? '' : 'disabled'}>+</button>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+
+            const popular = filtered.filter(item => item.badge);
+
+            popularScroll.innerHTML = popular.map(item => `
+                <article class="popular-card" data-open-product="${escapeHtml(item.id)}">
+                    <img src="${escapeHtml(item.img)}" alt="${escapeHtml(getProductName(item))}" loading="lazy" onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'">
+
+                    <div style="padding:12px;display:flex;flex-direction:column;justify-content:center;">
+                        <div style="font-size:13px;font-weight:700;">${escapeHtml(getProductName(item))}</div>
+                        <div style="color:var(--primary-red);font-weight:800;margin-top:5px;">${formatPrice(item.price)}</div>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        function getDistrictApiValue(districtKey) {
+            const item = districtOptions.find(row => row.key === districtKey);
+            return item ? item.apiValue : 'Ocean Park 1';
+        }
+
+        function calculateDelivery(subtotal, type, districtKey) {
+            if (type !== 'delivery') {
+                return {
+                    deliveryFee: 0,
+                    deliveryFormatted: t('free'),
+                    note: '',
+                    type: t('pickupLabel')
+                };
+            }
+
+            if (districtKey === 'districtOceanPark1') {
+                return {
+                    deliveryFee: 0,
+                    deliveryFormatted: t('free'),
+                    note: t('deliveryFreeNote'),
+                    type: t('delivery')
+                };
+            }
+
+            if (districtKey === 'districtOceanPark2' || districtKey === 'districtEcoPark') {
+                const fee = subtotal >= 200000 ? 0 : 50000;
+
+                return {
+                    deliveryFee: fee,
+                    deliveryFormatted: fee === 0 ? t('free') : formatPrice(fee),
+                    note: t('deliveryOceanPark2Note'),
+                    type: t('delivery')
+                };
+            }
+
+            if (districtKey === 'districtHanoi') {
+                if (subtotal >= 500000) {
+                    return {
+                        deliveryFee: 0,
+                        deliveryFormatted: t('free'),
+                        note: t('deliveryHanoiMidNote'),
+                        type: t('delivery')
+                    };
+                }
+
+                if (subtotal >= 200000) {
+                    return {
+                        deliveryFee: 80000,
+                        deliveryFormatted: formatPrice(80000),
+                        note: t('deliveryHanoiMidNote'),
+                        type: t('delivery')
+                    };
+                }
+
+                return {
+                    deliveryFee: 0,
+                    deliveryFormatted: t('grabTariff'),
+                    note: t('deliveryGrabNote'),
+                    type: 'Grab'
+                };
+            }
+
+            return {
+                deliveryFee: 0,
+                deliveryFormatted: t('free'),
+                note: '',
+                type: t('delivery')
+            };
+        }
+
+        function renderCart() {
+            const list = document.getElementById('cart-items-list');
+            const badge = document.getElementById('cart-badge');
+            const subtotalEl = document.getElementById('subtotal-amount');
+            const deliveryEl = document.getElementById('delivery-amount');
+            const totalEl = document.getElementById('total-amount');
+            const deliveryNoteEl = document.getElementById('delivery-note');
+            const emptyState = document.getElementById('cart-empty-state');
+            const cartFooter = document.getElementById('cart-footer');
+
+            const totalQty = state.cart.reduce((sum, item) => sum + item.qty, 0);
+            const subtotal = state.cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+            const type = document.getElementById('order-type')?.value || 'delivery';
+            const district = document.getElementById('order-district')?.value || 'districtOceanPark1';
+            const deliveryInfo = calculateDelivery(subtotal, type, district);
+            const total = subtotal + deliveryInfo.deliveryFee;
+
+            badge.textContent = totalQty;
+            badge.style.display = totalQty > 0 ? 'flex' : 'none';
+
+            emptyState.classList.toggle('hidden', state.cart.length > 0);
+            cartFooter.classList.toggle('hidden', state.cart.length === 0);
+
+            if (state.cart.length === 0) {
+                list.innerHTML = '';
+                subtotalEl.textContent = '0 ₫';
+                deliveryEl.textContent = '0 ₫';
+                totalEl.textContent = '0 ₫';
+                deliveryNoteEl.textContent = '';
+                return;
+            }
+
+            list.innerHTML = state.cart.map(item => `
+                <div class="cart-item">
+                    <img src="${escapeHtml(item.img)}" alt="${escapeHtml(item.name)}" onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'">
+
+                    <div>
+                        <div style="font-weight:700;font-size:14px;max-width:160px;">${escapeHtml(item.name)}</div>
+                        <div style="color:var(--primary-red);font-weight:700;margin-top:4px;">${formatPrice(item.price * item.qty)}</div>
+                    </div>
+
+                    <div class="cart-qty">
+                        <button type="button" class="qty-btn" data-qty-change="-1" data-product-id="${escapeHtml(item.id)}">-</button>
+                        <span style="font-weight:700;">${item.qty}</span>
+                        <button type="button" class="qty-btn" data-qty-change="1" data-product-id="${escapeHtml(item.id)}">+</button>
+                    </div>
+                </div>
+            `).join('');
+
+            subtotalEl.textContent = formatPrice(subtotal);
+            deliveryEl.textContent = deliveryInfo.deliveryFormatted;
+            totalEl.textContent = formatPrice(total);
+            deliveryNoteEl.textContent = deliveryInfo.note;
+        }
+
+        function renderOrderHistory() {
+            const container = document.getElementById('order-history');
+
+            if (!state.orderHistory.length) {
+                container.innerHTML = `<p style="opacity:0.5;">${escapeHtml(t('noOrders'))}</p>`;
+                return;
+            }
+
+            container.innerHTML = state.orderHistory.slice().reverse().map(order => `
+                <div class="history-item">
+                    <div style="font-weight:700;">${escapeHtml(t('orderFor'))} ${escapeHtml(order.orderNumber || '')}</div>
+                    <div style="font-size:13px;opacity:0.7;margin-top:4px;">${escapeHtml(order.createdAt || '')}</div>
+                    <div style="font-size:13px;margin-top:4px;">${escapeHtml(order.itemsSummary || '')}</div>
+                    <div style="font-size:13px;margin-top:4px;">${escapeHtml(order.deliveryLabel || '')}</div>
+                    <div style="font-weight:800;color:var(--primary-red);margin-top:4px;">${escapeHtml(order.total || '')}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderProfile() {
+            const user = tg.initDataUnsafe?.user;
+            const details = document.getElementById('profile-details');
+            const nameEl = document.getElementById('user-name');
+            const handleEl = document.getElementById('user-handle');
+            const photoEl = document.getElementById('user-photo');
+
+            if (user) {
+                const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ').trim() || t('userTelegram');
+
+                nameEl.textContent = fullName;
+                handleEl.textContent = user.username ? '@' + user.username : 'ID: ' + user.id;
+
+                details.innerHTML = `
+                    ${escapeHtml(t('tgId'))}: ${escapeHtml(user.id)}<br>
+                    ${escapeHtml(t('langField'))}: ${escapeHtml(user.language_code || '-')}${user.username ? `<br>${escapeHtml(t('usernameField'))}: @${escapeHtml(user.username)}` : ''}
+                `;
+
+                if (user.photo_url) {
+                    photoEl.innerHTML = `<img src="${escapeHtml(user.photo_url)}" alt="avatar" style="width:100%;height:100%;object-fit:cover;">`;
+                } else {
+                    photoEl.textContent = (user.first_name || '👤').slice(0, 1).toUpperCase();
+                }
+
+                const nameInput = document.getElementById('order-name');
+
+                if (!nameInput.value.trim()) {
+                    nameInput.value = fullName;
+                }
+            } else {
+                nameEl.textContent = t('guest');
+                handleEl.textContent = t('outsideTelegram');
+                details.textContent = t('openInTelegram');
+                photoEl.textContent = '👤';
+            }
+        }
+
+        function renderHeroPagination() {
+            const pagination = document.getElementById('hero-pagination');
+            const slides = Array.from(document.querySelectorAll('.hero-slide'));
+
+            pagination.innerHTML = slides.map((_, index) => `
+                <button type="button" class="hero-dot ${index === state.currentHeroSlide ? 'active' : ''}" data-hero-dot="${index}" aria-label="Slide ${index + 1}"></button>
+            `).join('');
+        }
+
+        function syncSearchInputs() {
+            const inputs = document.querySelectorAll('#search-input, .search-input-mirror');
+
+            inputs.forEach(input => {
+                if (input.value !== state.search) {
+                    input.value = state.search;
+                }
+            });
+        }
+
+        function showHeroSlide(index) {
+            const slides = Array.from(document.querySelectorAll('.hero-slide'));
+
+            if (!slides.length) return;
+
+            const normalizedIndex = (index + slides.length) % slides.length;
+            state.currentHeroSlide = normalizedIndex;
+
+            slides.forEach((slide, slideIndex) => {
+                slide.classList.toggle('active', slideIndex === normalizedIndex);
+            });
+
+            document.querySelectorAll('.hero-dot').forEach((dot, dotIndex) => {
+                dot.classList.toggle('active', dotIndex === normalizedIndex);
+            });
+
+            syncSearchInputs();
+        }
+
+        function nextHeroSlide() {
+            showHeroSlide(state.currentHeroSlide + 1);
+        }
+
+        function prevHeroSlide() {
+            showHeroSlide(state.currentHeroSlide - 1);
+        }
+
+        function startHeroAutoplay() {
+            stopHeroAutoplay();
+            state.heroAutoplay = setInterval(() => nextHeroSlide(), 4500);
+        }
+
+        function stopHeroAutoplay() {
+            if (state.heroAutoplay) {
+                clearInterval(state.heroAutoplay);
+                state.heroAutoplay = null;
+            }
+        }
+
+        function switchTab(tabName) {
+            state.activeTab = tabName;
+
+            document.querySelectorAll('.tab-content').forEach(node => {
+                node.classList.toggle('active', node.id === `${tabName}-tab`);
+            });
+
+            document.querySelectorAll('.nav-item').forEach(node => {
+                node.classList.toggle('active', node.dataset.tab === tabName);
+            });
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function saveCart() {
+            saveJSON(CART_STORAGE_KEY, state.cart);
+        }
+
+        function addToCart(productId) {
+            const product = products.find(item => String(item.id) === String(productId));
+
+            if (!product) return;
+
+            if (!product.is_available) {
+                tg.showAlert(t('unavailable'));
+                return;
+            }
+
+            const existing = state.cart.find(item => String(item.id) === String(product.id));
+
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                state.cart.push({
+                    id: product.id,
+                    img: product.img,
+                    price: product.price,
+                    qty: 1,
+                    name: getProductName(product)
+                });
+            }
+
+            saveCart();
+            renderCart();
+            tg.HapticFeedback?.impactOccurred?.('medium');
+        }
+
+        function syncCartWithBackend() {
+            state.cart = state.cart
+                .map(entry => {
+                    const product = products.find(item => String(item.id) === String(entry.id));
+
+                    if (!product || !product.is_available) {
+                        return null;
+                    }
+
+                    return {
+                        ...entry,
+                        id: product.id,
+                        img: product.img,
+                        price: product.price,
+                        name: getProductName(product)
+                    };
+                })
+                .filter(Boolean);
+
+            saveCart();
+        }
+
+        function syncCartLanguage() {
+            state.cart = state.cart.map(entry => {
+                const product = products.find(item => String(item.id) === String(entry.id));
+                return product ? { ...entry, name: getProductName(product) } : entry;
+            });
+
+            saveCart();
+        }
+
+        function updateCartQty(productId, delta) {
+            const item = state.cart.find(entry => String(entry.id) === String(productId));
+
+            if (!item) return;
+
+            item.qty += delta;
+
+            if (item.qty <= 0) {
+                state.cart = state.cart.filter(entry => String(entry.id) !== String(productId));
+            }
+
+            saveCart();
+            renderCart();
+        }
+
+        function openModal(productId) {
+            const product = products.find(item => String(item.id) === String(productId));
+
+            if (!product) return;
+
+            document.getElementById('modal-img').src = product.img;
+            document.getElementById('modal-img').onerror = function () {
+                this.onerror = null;
+                this.src = PLACEHOLDER_IMG;
+            };
+
+            document.getElementById('modal-name').textContent = getProductName(product);
+            document.getElementById('modal-price').textContent = formatPrice(product.price);
+            document.getElementById('modal-desc').textContent = getProductDesc(product);
+            document.getElementById('modal-add-btn').textContent = product.is_available ? t('addToCart') : t('unavailable');
+            document.getElementById('modal-add-btn').disabled = !product.is_available;
+
+            document.getElementById('modal-add-btn').onclick = function () {
+                addToCart(product.id);
+                closeModal();
+            };
+
+            document.getElementById('product-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('product-modal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function syncAddressVisibility() {
+            const type = document.getElementById('order-type').value;
+            const addressGroup = document.getElementById('address-group');
+            const districtGroup = document.getElementById('district-group');
+            const addressInput = document.getElementById('order-address');
+            const isDelivery = type === 'delivery';
+
+            addressGroup.classList.toggle('hidden', !isDelivery);
+            districtGroup.classList.toggle('hidden', !isDelivery);
+            addressInput.required = isDelivery;
+
+            if (!isDelivery) {
+                addressInput.value = '';
+            }
+
+            renderCart();
+        }
+
+        function saveFormDraft() {
+            const formData = {
+                name: document.getElementById('order-name').value,
+                phone: document.getElementById('order-phone').value,
+                address: document.getElementById('order-address').value,
+                type: document.getElementById('order-type').value,
+                district: document.getElementById('order-district').value,
+                time: document.getElementById('order-time').value,
+                comment: document.getElementById('order-comment').value
+            };
+
+            saveJSON(FORM_STORAGE_KEY, formData);
+        }
+
+        function restoreFormDraft() {
+            const formData = loadJSON(FORM_STORAGE_KEY, null);
+
+            if (!formData) return;
+
+            document.getElementById('order-name').value = formData.name || '';
+            document.getElementById('order-phone').value = formData.phone || '';
+            document.getElementById('order-address').value = formData.address || '';
+            document.getElementById('order-type').value = formData.type || 'delivery';
+            document.getElementById('order-district').value = formData.district || 'districtOceanPark1';
+            document.getElementById('order-time').value = formData.time || '2';
+            document.getElementById('order-comment').value = formData.comment || '';
+
+            syncAddressVisibility();
+        }
+
+        function getDistrictApiValue(districtKey) {
+            const item = districtOptions.find(row => row.key === districtKey);
+            return item ? item.apiValue : 'Ocean Park 1';
+        }
+
+        function buildOrderPayload() {
+            const name = document.getElementById('order-name').value.trim();
+            const phone = document.getElementById('order-phone').value.trim();
+            const address = document.getElementById('order-address').value.trim();
+            const type = document.getElementById('order-type').value;
+            const districtKey = document.getElementById('order-district').value;
+            const deliveryHours = Math.max(2, Number(document.getElementById('order-time').value || '2'));
+            const comment = document.getElementById('order-comment').value.trim();
+            const isDelivery = type === 'delivery';
+
+            if (!name || !phone || !deliveryHours || (isDelivery && !address)) {
+                tg.showAlert(t('requiredFields'));
+                return null;
+            }
+
+            if (!state.cart.length) {
+                tg.showAlert(t('emptyCartAlert'));
+                return null;
+            }
+
+            const subtotal = state.cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+            const deliveryInfo = calculateDelivery(subtotal, type, districtKey);
+            const total = subtotal + deliveryInfo.deliveryFee;
+
+            const items = state.cart.map(item => ({
+                product_id: String(item.id),
+                qty: item.qty
+            }));
+
+            const localItems = state.cart.map(item => ({
+                name: item.name,
+                qty: item.qty,
+                price: item.price,
+                total: item.price * item.qty
+            }));
+
+            return {
+                apiPayload: {
+                    customer_name: name,
+                    phone,
+                    address: isDelivery ? address : '',
+                    district: isDelivery ? getDistrictApiValue(districtKey) : 'Самовывоз',
+                    order_type: type,
+                    delivery_time_hours: deliveryHours,
+                    comment: comment || '',
+                    telegram_user_id: String(tg.initDataUnsafe?.user?.id || ''),
+                    username: tg.initDataUnsafe?.user?.username || '',
+                    language: state.language,
+                    items
+                },
+                localView: {
+                    createdAt: new Date().toLocaleString(state.language === 'ru' ? 'ru-RU' : 'en-US'),
+                    total: formatPrice(total),
+                    typeLabel: isDelivery ? t('delivery') : t('pickup'),
+                    deliveryLabel: `${t('deliveryFee')}: ${deliveryInfo.deliveryFormatted}`,
+                    itemsSummary: localItems.map(item => `${item.name} × ${item.qty}`).join(', ')
+                }
+            };
+        }
+
+        function saveOrderToHistory(localView) {
+            state.orderHistory.push(localView);
+            saveJSON(HISTORY_STORAGE_KEY, state.orderHistory);
+            renderOrderHistory();
+        }
+
+        function clearOrderFormAfterSuccess() {
+            state.cart = [];
+            saveCart();
+            renderCart();
+
+            document.getElementById('order-phone').value = '';
+            document.getElementById('order-address').value = '';
+            document.getElementById('order-comment').value = '';
+            document.getElementById('order-type').value = 'delivery';
+            document.getElementById('order-district').value = 'districtOceanPark1';
+            document.getElementById('order-time').value = '2';
+
+            syncAddressVisibility();
+            saveFormDraft();
+            switchTab('menu');
+        }
+
+        async function sendOrder() {
+            const checkoutBtn = document.getElementById('checkout-btn');
+            const order = buildOrderPayload();
+
+            if (!order) return;
+
+            tg.showConfirm(t('confirmOrder'), async confirmed => {
+                if (!confirmed) return;
+
+                try {
+                    checkoutBtn.disabled = true;
+                    checkoutBtn.textContent = t('sendingOrder');
+
+                    const result = await apiPost('/api/orders', order.apiPayload);
+
+                    saveOrderToHistory({
+                        ...order.localView,
+                        orderNumber: result.order_number ? `#${result.order_number}` : '',
+                        total: result.total_formatted || order.localView.total
+                    });
+
+                    clearOrderFormAfterSuccess();
+
+                    tg.showAlert(`${t('orderPlaced')} ${result.order_number ? t('orderNumber') + ': #' + result.order_number : ''}`);
+
+                } catch (error) {
+                    console.error('Order send error:', error);
+                    tg.showAlert(`Error: ${error.message}`);
+                } finally {
+                    checkoutBtn.disabled = false;
+                    checkoutBtn.textContent = t('checkout');
+                }
+            });
+        }
+
+        function rerenderAll() {
+            applyTranslations();
+            renderDistrictOptions();
+            renderCategories();
+            syncCartLanguage();
+            renderMenu();
+            renderCart();
+            renderProfile();
+            renderOrderHistory();
+            syncSearchInputs();
+        }
+
+        let eventsBound = false;
+
+        function bindEvents() {
+            if (eventsBound) return;
+            eventsBound = true;
+
+            document.addEventListener('click', event => {
+                const navItem = event.target.closest('.nav-item');
+
+                if (navItem) {
+                    event.preventDefault();
+                    switchTab(navItem.dataset.tab);
+                    return;
+                }
+
+                const langButton = event.target.closest('[data-language]');
+
+                if (langButton) {
+                    event.preventDefault();
+                    state.language = langButton.dataset.language === 'ru' ? 'ru' : 'en';
+                    saveLanguage();
+                    rerenderAll();
+                    return;
+                }
+
+                const categoryChip = event.target.closest('[data-category]');
+
+                if (categoryChip) {
+                    state.activeCategory = categoryChip.dataset.category;
+                    renderCategories();
+                    renderMenu();
+                    return;
+                }
+
+                const addButton = event.target.closest('[data-add-product]');
+
+                if (addButton) {
+                    event.stopPropagation();
+                    addToCart(addButton.dataset.addProduct);
+                    return;
+                }
+
+                const productCard = event.target.closest('[data-open-product]');
+
+                if (productCard) {
+                    openModal(productCard.dataset.openProduct);
+                    return;
+                }
+
+                const qtyButton = event.target.closest('[data-qty-change]');
+
+                if (qtyButton) {
+                    updateCartQty(qtyButton.dataset.productId, Number(qtyButton.dataset.qtyChange));
+                    return;
+                }
+
+                const modalClose = event.target.closest('#modal-close-btn');
+
+                if (modalClose) {
+                    closeModal();
+                    return;
+                }
+
+                if (event.target.id === 'product-modal') {
+                    closeModal();
+                    return;
+                }
+
+                const heroDot = event.target.closest('[data-hero-dot]');
+
+                if (heroDot) {
+                    showHeroSlide(Number(heroDot.dataset.heroDot));
+                    startHeroAutoplay();
+                }
+            });
+
+            document.addEventListener('change', event => {
+                if (
+                    event.target.id === 'order-type' ||
+                    event.target.id === 'order-district' ||
+                    event.target.id === 'order-time'
+                ) {
+                    syncAddressVisibility();
+                    saveFormDraft();
+                    renderCart();
+                }
+            });
+
+            document.addEventListener('input', event => {
+                if (event.target.matches('#search-input, .search-input-mirror')) {
+                    state.search = event.target.value;
+                    syncSearchInputs();
+                    renderMenu();
+                    return;
+                }
+
+                if (
+                    event.target.id === 'order-name' ||
+                    event.target.id === 'order-phone' ||
+                    event.target.id === 'order-address' ||
+                    event.target.id === 'order-comment'
+                ) {
+                    saveFormDraft();
+                }
+            });
+
+            const checkoutBtn = document.getElementById('checkout-btn');
+            if (checkoutBtn) {
+                checkoutBtn.addEventListener('click', sendOrder);
+            }
+
+            const heroSlider = document.getElementById('hero-slider');
+
+            if (heroSlider) {
+                heroSlider.addEventListener('touchstart', event => {
+                    state.heroTouchStartX = event.changedTouches[0].clientX;
+                    stopHeroAutoplay();
+                }, { passive: true });
+
+                heroSlider.addEventListener('touchend', event => {
+                    state.heroTouchEndX = event.changedTouches[0].clientX;
+                    const diff = state.heroTouchEndX - state.heroTouchStartX;
+
+                    if (Math.abs(diff) > 40) {
+                        if (diff < 0) {
+                            nextHeroSlide();
+                        } else {
+                            prevHeroSlide();
+                        }
+                    }
+
+                    startHeroAutoplay();
+                }, { passive: true });
+
+                heroSlider.addEventListener('mouseenter', stopHeroAutoplay);
+                heroSlider.addEventListener('mouseleave', startHeroAutoplay);
+            }
+
+            document.addEventListener('keydown', event => {
+                if (event.key === 'Escape') closeModal();
+
+                if (event.key === 'ArrowRight') {
+                    nextHeroSlide();
+                    startHeroAutoplay();
+                }
+
+                if (event.key === 'ArrowLeft') {
+                    prevHeroSlide();
+                    startHeroAutoplay();
+                }
+            });
+        }
+
+        async function init() {
+            bindEvents();
+
+            applyTranslations();
+            renderDistrictOptions();
+            renderLanguageFlags();
+            renderHeroPagination();
+            showHeroSlide(0);
+            renderCart();
+            renderProfile();
+            renderOrderHistory();
+
+            await loadBackendData();
+
+            renderCategories();
+            renderMenu();
+            renderCart();
+            restoreFormDraft();
+            syncAddressVisibility();
+
+            startHeroAutoplay();
+        }
+
+        init();
+    </script>
+</body>
+</html>
